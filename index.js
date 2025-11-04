@@ -32,7 +32,7 @@ const PORT = process.env.PORT || 5500;
 // app.listen(PORT, () => {
 //   console.log(`Server running on port http://localhost:${PORT}`);
 // });
-app.listen(PORT, "localhost", () => {
+app.listen(PORT, "0.0.0.0", () => {
   //change the ip add on your host ip (use i>
   console.log(`Server running on port  localhost:${PORT}`);
 });
