@@ -7,12 +7,12 @@ dotenv.config();
 
 const generateAccessToken = (user) => {
   return jwt.sign(
-    { 
+    {
       id: user.user_id,
       email: user.email,
       full_name: user.full_name,
       username: user.username,
-      role: user.role 
+      role: user.role,
     },
     process.env.JWT_SECRET || "SECRETBEBAS",
     { expiresIn: "7h" }
@@ -21,12 +21,12 @@ const generateAccessToken = (user) => {
 
 const generateRefreshToken = (user) => {
   return jwt.sign(
-    { 
+    {
       id: user.user_id,
       email: user.email,
       full_name: user.full_name,
       username: user.username,
-      role: user.role
+      role: user.role,
     },
     process.env.JWT_REFRESH_SECRET || "REFRESHSECRETBEBAS",
     { expiresIn: "7d" }
@@ -37,7 +37,7 @@ export const login = async (req, res) => {
   try {
     const { username, password } = req.body;
     const [rows] = await db.query("SELECT * FROM users WHERE username = ?", [username]);
-    
+
     if (rows.length === 0) {
       return res.status(404).json({ msg: "User not found" });
     }
@@ -59,10 +59,7 @@ export const login = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 hari
     });
 
-    await db.query(
-      "UPDATE users SET last_login = NOW(), is_active = 1 WHERE user_id = ?",
-      [user.user_id]
-    );
+    await db.query("UPDATE users SET last_login = NOW(), is_active = 1 WHERE user_id = ?", [user.user_id]);
 
     return res.status(200).json({
       msg: "Login successfully",
@@ -86,10 +83,7 @@ export const register = async (req, res) => {
     const { username, password, full_name, role } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const [result] = await db.query(
-      "INSERT INTO users (username, password, full_name, role, created_at, is_active) VALUES (?, ?, ?, ?, NOW(), 0)",
-      [username, hashedPassword, full_name, role]
-    );
+    const [result] = await db.query("INSERT INTO users (username, password, full_name, role, created_at, is_active) VALUES (?, ?, ?, ?, NOW(), 0)", [username, hashedPassword, full_name, role]);
 
     const newUser = {
       id: result.insertId,
@@ -117,36 +111,32 @@ export const refreshToken = async (req, res) => {
     return res.status(403).json({ msg: "No refresh token provided" });
   }
 
-  jwt.verify(
-    refreshToken,
-    process.env.JWT_REFRESH_SECRET || "REFRESHSECRETBEBAS",
-    (err, decoded) => {
-      if (err) {
-        return res.status(403).json({ msg: "Invalid refresh token" });
-      }
-
-      console.log("🔄 Refresh Token Data:", decoded); // Debugging
-
-      if (!decoded.full_name) {
-        console.error("⚠️ Full name is missing in refresh token!");
-      }
-
-      const newAccessToken = generateAccessToken({
-        id: decoded.id,
-        email: decoded.email,
-        full_name: decoded.full_name,
-        username: decoded.username,
-        role: decoded.role,
-      });
-
-      return res.status(200).json({ 
-        token: newAccessToken,
-        full_name: decoded.full_name,
-        username: decoded.username,
-        role: decoded.role,
-      });
+  jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET || "REFRESHSECRETBEBAS", (err, decoded) => {
+    if (err) {
+      return res.status(403).json({ msg: "Invalid refresh token" });
     }
-  );
+
+    console.log("🔄 Refresh Token Data:", decoded); // Debugging
+
+    if (!decoded.full_name) {
+      console.error("⚠️ Full name is missing in refresh token!");
+    }
+
+    const newAccessToken = generateAccessToken({
+      user_id: decoded.id,
+      email: decoded.email,
+      full_name: decoded.full_name,
+      username: decoded.username,
+      role: decoded.role,
+    });
+
+    return res.status(200).json({
+      token: newAccessToken,
+      full_name: decoded.full_name,
+      username: decoded.username,
+      role: decoded.role,
+    });
+  });
 };
 
 export const logout = async (req, res) => {
