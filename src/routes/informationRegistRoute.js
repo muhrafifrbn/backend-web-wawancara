@@ -1,10 +1,24 @@
 import express from "express";
-import { getUsers } from "../controllers/informationRegistController.js";
+import {
+  getInformationRegist,
+  getInformationById,
+  submitInformationRegist,
+  updateInformationRegist,
+  deleteInformationRegist
+} from "../controllers/informationRegistController.js";
+
 import { verifyToken, verifyAdmin } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
-// Panitia and Admin Can Use
-router.get("/", verifyToken, getUsers);
+router.get("/", verifyToken, getInformationRegist);
+
+router.get("/:id", verifyToken, getInformationById);
+
+router.post("/", verifyToken, verifyAdmin, submitInformationRegist);
+
+router.put("/:id", verifyToken, verifyAdmin, updateInformationRegist);
+
+router.delete("/:id", verifyToken, verifyAdmin, deleteInformationRegist);
 
 export default router;

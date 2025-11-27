@@ -1,7 +1,6 @@
 import db from "../config/db.js";
 
-// Get All Users
-export const getUsers = async (req, res) => {
+export const getInformationRegist = async (req, res) => {
   try {
     const [result] = await db.query("SELECT * FROM student_registration ORDER BY id DESC");
     return res.status(200).json({
@@ -11,8 +10,109 @@ export const getUsers = async (req, res) => {
     });
   } catch (error) {
     return res.status(500).json({
-      msg: "Failed to retrieve users",
+      msg: "Failed to retrieve data",
       error: error.message,
     });
+  }
+};
+
+export const submitInformationRegist = async (req, res) => {
+  const { nama_gelombang, deskripsi, tanggal_mulai, tanggal_akhir, tahun_ajaran, kouta, status_gelombang } = req.body;
+
+  try {
+    const sql = `
+      INSERT INTO student_registration 
+      (nama_gelombang, deskripsi, tanggal_mulai, tanggal_akhir, tahun_ajaran, kouta, status_gelombang) 
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    const [result] = await db.execute(sql, [nama_gelombang, deskripsi, tanggal_mulai, tanggal_akhir, tahun_ajaran, kouta, status_gelombang]);
+
+    return res.status(201).json({
+      message: "Create Information successfully",
+      data: { id: result.insertId },
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+export const getInformationById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const [rows] = await db.query("SELECT * FROM student_registration WHERE id = ?", [id]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({
+        status: 404,
+        msg: "Data not found",
+      });
+    }
+
+    return res.status(200).json({
+      status: 200,
+      msg: "Success Get Data",
+      data: rows[0],
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+export const updateInformationRegist = async (req, res) => {
+  const { id } = req.params;
+  const { nama_gelombang, deskripsi, tanggal_mulai, tanggal_akhir, tahun_ajaran, kouta, status_gelombang } = req.body;
+
+  try {
+    const sql = `
+      UPDATE student_registration SET
+        nama_gelombang = ?,
+        deskripsi = ?,
+        tanggal_mulai = ?,
+        tanggal_akhir = ?,
+        tahun_ajaran = ?,
+        kouta = ?,
+        status_gelombang = ?
+      WHERE id = ?
+    `;
+
+    const [result] = await db.execute(sql, [nama_gelombang, deskripsi, tanggal_mulai, tanggal_akhir, tahun_ajaran, kouta, status_gelombang, id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        status: 404,
+        msg: "Data not found",
+      });
+    }
+
+    return res.status(200).json({
+      status: 200,
+      msg: "Update Information Successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+export const deleteInformationRegist = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const [result] = await db.execute("DELETE FROM student_registration WHERE id = ?", [id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        status: 404,
+        msg: "Data not found",
+      });
+    }
+
+    return res.status(200).json({
+      status: 200,
+      msg: "Delete Information Successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
   }
 };
