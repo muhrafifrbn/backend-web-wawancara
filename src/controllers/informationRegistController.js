@@ -84,9 +84,9 @@ export const updateInformationRegist = async (req, res) => {
 
     const [result] = await db.execute(sql, [nama_gelombang, deskripsi, tanggal_mulai, tanggal_akhir, tahun_ajaran, kouta, status_gelombang, id]);
 
-     const informationRegistId = result.insertId;
+    const informationRegistId = result.insertId;
 
-      await db.query("INSERT INTO user_logs (user_id, action) VALUES (?,?)", [user_id, `Update Information Registration Data ID-${informationRegistId} Name Child ${nama_gelombang}`]);
+    await db.query("INSERT INTO user_logs (user_id, action) VALUES (?,?)", [user_id, `Update Information Registration Data ID-${informationRegistId} Name Child ${nama_gelombang}`]);
 
     if (result.affectedRows === 0) {
       return res.status(404).json({
@@ -111,7 +111,7 @@ export const deleteInformationRegist = async (req, res) => {
     const user_id = req.user_id;
     const [result] = await db.execute("DELETE FROM student_registration WHERE id = ?", [id]);
 
-     const informationRegistId = result.insertId;
+    const informationRegistId = id;
 
     await db.query("INSERT INTO user_logs (user_id, action) VALUES (?,?)", [user_id, `Delete Information Registration Data ID-${informationRegistId}`]);
 
