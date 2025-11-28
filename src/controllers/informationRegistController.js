@@ -17,17 +17,21 @@ export const getInformationRegist = async (req, res) => {
 };
 
 export const submitInformationRegist = async (req, res) => {
-  const { nama_gelombang, deskripsi, tanggal_mulai, tanggal_akhir, tahun_ajaran, kouta, status_gelombang } = req.body;
+  const { nama_gelombang, deskripsi, tanggal_mulai, tanggal_akhir, tahun_ajaran } = req.body;
 
   try {
+    const user_id = req.user_id;
     const sql = `
       INSERT INTO student_registration 
       (nama_gelombang, deskripsi, tanggal_mulai, tanggal_akhir, tahun_ajaran, kouta, status_gelombang) 
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
 
-    const [result] = await db.execute(sql, [nama_gelombang, deskripsi, tanggal_mulai, tanggal_akhir, tahun_ajaran, kouta, status_gelombang]);
+    const [result] = await db.execute(sql, [nama_gelombang, deskripsi, tanggal_mulai, tanggal_akhir, tahun_ajaran, 2, "aktif"]);
 
+    const informationRegistId = result.insertId;
+
+    await db.query("INSERT INTO user_logs (user_id, action) VALUES (?,?)", [user_id, `Added Information Registration Data ID-${informationRegistId} Name Child ${nama_gelombang}`]);
     return res.status(201).json({
       message: "Create Information successfully",
       data: { id: result.insertId },

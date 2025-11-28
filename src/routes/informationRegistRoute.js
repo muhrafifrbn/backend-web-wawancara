@@ -1,11 +1,5 @@
 import express from "express";
-import {
-  getInformationRegist,
-  getInformationById,
-  submitInformationRegist,
-  updateInformationRegist,
-  deleteInformationRegist
-} from "../controllers/informationRegistController.js";
+import { getInformationRegist, getInformationById, submitInformationRegist, updateInformationRegist, deleteInformationRegist } from "../controllers/informationRegistController.js";
 
 import { verifyToken, verifyAdmin } from "../middlewares/authMiddleware.js";
 
@@ -15,10 +9,10 @@ router.get("/", verifyToken, getInformationRegist);
 
 router.get("/:id", verifyToken, getInformationById);
 
-router.post("/", verifyToken, verifyAdmin, submitInformationRegist);
+router.post("/create", verifyToken, verifyAdmin, submitInformationRegist);
 
-router.put("/:id", verifyToken, verifyAdmin, updateInformationRegist);
+router.put("/update/:id", verifyToken, verifyAdmin, updateInformationRegist);
 
-router.delete("/:id", verifyToken, verifyAdmin, deleteInformationRegist);
+router.delete("/delete/:id", verifyToken, verifyAdmin, deleteInformationRegist);
 
 export default router;
