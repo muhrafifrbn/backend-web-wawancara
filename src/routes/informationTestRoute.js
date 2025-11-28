@@ -11,14 +11,13 @@ import { verifyToken, verifyAdmin } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
+// Panitia + Admin
 router.get("/", verifyToken, getInformationTest);
-
 router.get("/:id", verifyToken, getInformationTestById);
 
-router.post("/create", verifyToken, verifyAdmin, submitInformationTest);
-
-router.put("/update/:id", verifyToken, verifyAdmin, updateInformationTest);
-
-router.delete("/delete/:id", verifyToken, verifyAdmin, deleteInformationTest);
+// Admin only
+router.post("/", verifyToken, verifyAdmin, submitInformationTest);
+router.put("/:id", verifyToken, verifyAdmin, updateInformationTest);
+router.delete("/:id", verifyToken, verifyAdmin, deleteInformationTest);
 
 export default router;

@@ -11,7 +11,8 @@ import loggingRouter from "./src/routes/logRouter.js";
 import indexRoutes from "./src/routes/indexRoutes.js";
 import userRoutes from "./src/routes/userRoutes.js";
 import registrationRoutes from "./src/routes/registrationRoutes.js";
-import informationRegist from "./src/routes/informationRegistRoute.js";
+import informationRegistRoutes from "./src/routes/informationRegistRoute.js";
+import informationTestRoutes from "./src/routes/informationTestRoute.js";
 
 const app = express();
 
@@ -32,7 +33,8 @@ app.use("/api/dashboard", dashboardRouter);
 app.use("/api/logging", loggingRouter);
 app.use("/api/user", userRoutes);
 app.use("/api/registration", registrationRoutes);
-app.use("/api/information/registration", informationRegist);
+app.use("/api/information/registration", informationRegistRoutes);
+app.use("/api/information/test", informationTestRoutes);
 app.use(indexRoutes);
 
 const PORT = process.env.PORT || 5500;
