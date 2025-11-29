@@ -14,9 +14,9 @@ const router = express.Router();
 // Panitia + Admin
 router.get("/", verifyToken, getInformationTest);
 router.get("/:id", verifyToken, getInformationTestById);
+router.post("/", verifyToken, verifyAdmin, submitInformationTest);
 
 // Admin only
-router.post("/", verifyToken, verifyAdmin, submitInformationTest);
 router.put("/:id", verifyToken, verifyAdmin, updateInformationTest);
 router.delete("/:id", verifyToken, verifyAdmin, deleteInformationTest);
 
