@@ -2,7 +2,12 @@ import db from "../config/db.js";
 
 export const getInformationRegist = async (req, res) => {
   try {
-    const [result] = await db.query("SELECT * FROM student_registration ORDER BY id DESC");
+    const [result] = await db.query(`
+      SELECT id, nama_gelombang, deskripsi, tanggal_mulai, tanggal_akhir,
+      tahun_ajaran, status_gelombang
+      FROM student_registration
+      ORDER BY id DESC
+    `);
     return res.status(200).json({
       status: 200,
       msg: "Success Get Data Information Registration",
@@ -23,11 +28,11 @@ export const submitInformationRegist = async (req, res) => {
     const user_id = req.user_id;
     const sql = `
       INSERT INTO student_registration 
-      (nama_gelombang, deskripsi, tanggal_mulai, tanggal_akhir, tahun_ajaran, kouta, status_gelombang) 
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      (nama_gelombang, deskripsi, tanggal_mulai, tanggal_akhir, tahun_ajaran, status_gelombang) 
+      VALUES (?, ?, ?, ?, ?, ?)
     `;
 
-    const [result] = await db.execute(sql, [nama_gelombang, deskripsi, tanggal_mulai, tanggal_akhir, tahun_ajaran, 2, "aktif"]);
+    const [result] = await db.execute(sql, [nama_gelombang, deskripsi, tanggal_mulai, tanggal_akhir, tahun_ajaran, "aktif"]);
 
     const informationRegistId = result.insertId;
 
@@ -45,7 +50,8 @@ export const getInformationById = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const [rows] = await db.query("SELECT * FROM student_registration WHERE id = ?", [id]);
+    const [rows] = await db.query(`SELECT id, nama_gelombang, deskripsi, tanggal_mulai,  tanggal_akhir,
+      tahun_ajaran,  status_gelombang  FROM student_registration WHERE id = ?`, [id]);
 
     if (rows.length === 0) {
       return res.status(404).json({
@@ -66,7 +72,7 @@ export const getInformationById = async (req, res) => {
 
 export const updateInformationRegist = async (req, res) => {
   const { id } = req.params;
-  const { nama_gelombang, deskripsi, tanggal_mulai, tanggal_akhir, tahun_ajaran, kouta, status_gelombang } = req.body;
+  const { nama_gelombang, deskripsi, tanggal_mulai, tanggal_akhir, tahun_ajaran, status_gelombang } = req.body;
 
   try {
     const user_id = req.user_id;
@@ -77,12 +83,11 @@ export const updateInformationRegist = async (req, res) => {
         tanggal_mulai = ?,
         tanggal_akhir = ?,
         tahun_ajaran = ?,
-        kouta = ?,
         status_gelombang = ?
       WHERE id = ?
     `;
 
-    const [result] = await db.execute(sql, [nama_gelombang, deskripsi, tanggal_mulai, tanggal_akhir, tahun_ajaran, kouta, status_gelombang, id]);
+    const [result] = await db.execute(sql, [nama_gelombang, deskripsi, tanggal_mulai, tanggal_akhir, tahun_ajaran, status_gelombang, id]);
 
     const informationRegistId = result.insertId;
 
