@@ -3,7 +3,11 @@ import db from "../config/db.js";
 // GET ALL
 export const getInformationTest = async (req, res) => {
   try {
-    const [result] = await db.query("SELECT * FROM information_test ORDER BY id DESC");
+    const [result] = await db.query(
+      `SELECT id, nama_tes, deskripsi_tes 
+       FROM information_test 
+       ORDER BY id DESC`
+    );
 
     return res.status(200).json({
       status: 200,
@@ -53,7 +57,12 @@ export const getInformationTestById = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const [rows] = await db.query("SELECT * FROM information_test WHERE id = ?", [id]);
+     const [rows] = await db.query(
+      `SELECT id, nama_tes, deskripsi_tes, created_at 
+       FROM information_test 
+       WHERE id = ?`,
+      [id]
+    );
 
     if (rows.length === 0) {
       return res.status(404).json({
@@ -78,7 +87,9 @@ export const updateInformationTest = async (req, res) => {
   const { nama_tes, deskripsi_tes } = req.body;
 
   try {
-    const user_id = req.user_id;
+      const user_id = req.user_id;
+      nama_tes = nama_tes?.trim();
+      deskripsi_tes = deskripsi_tes?.trim();
 
     const sql = `
       UPDATE information_test SET
