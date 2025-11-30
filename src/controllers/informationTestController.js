@@ -24,10 +24,12 @@ export const getInformationTest = async (req, res) => {
 
 // CREATE
 export const submitInformationTest = async (req, res) => {
-  const { nama_tes, deskripsi_tes } = req.body;
+  let { nama_tes, deskripsi_tes } = req.body;
 
   try {
     const user_id = req.user_id;
+    nama_tes = nama_tes?.trim();
+    deskripsi_tes = deskripsi_tes?.trim();
 
     const sql = `
       INSERT INTO information_test (nama_tes, deskripsi_tes)
@@ -84,7 +86,7 @@ export const getInformationTestById = async (req, res) => {
 // UPDATE
 export const updateInformationTest = async (req, res) => {
   const { id } = req.params;
-  const { nama_tes, deskripsi_tes } = req.body;
+  let { nama_tes, deskripsi_tes } = req.body;
 
   try {
       const user_id = req.user_id;
