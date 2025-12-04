@@ -4,10 +4,18 @@ import db from "../config/db.js";
 export const getTestSchedule = async (req, res) => {
   try {
     const [result] = await db.query(`
-      SELECT ts.*, sr.nama_gelombang
+      SELECT 
+        ts.id, 
+        ts.tanggal_tes, 
+        ts.jam_mulai, 
+        ts.jam_selesai, 
+        ts.informasi_ruangan, 
+        ts.id_gelombang,
+        sr.nama_gelombang
       FROM test_schedule ts
-      LEFT JOIN student_registration sr ON ts.id_gelombang = sr.id
-      ORDER BY ts.id DESC
+      LEFT JOIN student_registration sr 
+            ON ts.id_gelombang = sr.id
+      ORDER BY ts.tanggal_tes DESC, ts.jam_mulai DESC
     `);
 
     return res.status(200).json({
@@ -25,14 +33,22 @@ export const getTestSchedule = async (req, res) => {
 
 // GET BY ID
 export const getTestScheduleById = async (req, res) => {
-  const { id } = req.params;
-
   try {
+    const { id } = req.params;
+
     const [rows] = await db.query(
       `
-      SELECT ts.*, sr.nama_gelombang 
+      SELECT 
+        ts.id, 
+        ts.tanggal_tes, 
+        ts.jam_mulai, 
+        ts.jam_selesai, 
+        ts.informasi_ruangan, 
+        ts.id_gelombang,
+        sr.nama_gelombang
       FROM test_schedule ts
-      LEFT JOIN student_registration sr ON ts.id_gelombang = sr.id
+      LEFT JOIN student_registration sr 
+            ON ts.id_gelombang = sr.id
       WHERE ts.id = ?
       `,
       [id]
@@ -57,38 +73,40 @@ export const getTestScheduleById = async (req, res) => {
 
 // CREATE
 export const submitTestSchedule = async (req, res) => {
-  const { tanggal_tes, jam_mulai, jam_selesai, informasi_ruangan, id_gelombang } = req.body;
-
   try {
+    const { tanggal_tes, jam_mulai, jam_selesai, informasi_ruangan, id_gelombang } = req.body;
     const user_id = req.user_id;
 
+    // Validasi jam
+    if (jam_mulai >= jam_selesai) {
+      return res.status(400).json({ msg: "jam_mulai must be earlier than jam_selesai" });
+    }
+
+    // Validasi gelombang
+    const [gel] = await db.query("SELECT id FROM student_registration WHERE id = ?", [id_gelombang]);
+
+    if (gel.length === 0) {
+      return res.status(400).json({ msg: "Invalid id_gelombang" });
+    }
+
     const sql = `
-      INSERT INTO test_schedule
+      INSERT INTO test_schedule 
       (tanggal_tes, jam_mulai, jam_selesai, informasi_ruangan, id_gelombang)
       VALUES (?, ?, ?, ?, ?)
     `;
 
-    const [result] = await db.execute(sql, [
-      tanggal_tes, 
-      jam_mulai, 
-      jam_selesai, 
-      informasi_ruangan, 
-      id_gelombang
-    ]);
+    const [result] = await db.execute(sql, [tanggal_tes, jam_mulai, jam_selesai, informasi_ruangan, id_gelombang]);
 
     const insertedId = result.insertId;
 
-    await db.query(
-      "INSERT INTO user_logs (user_id, action) VALUES (?, ?)",
-      [user_id, `Added Test Schedule ID-${insertedId}`]
-    );
+    // Logging
+    await db.query("INSERT INTO user_logs (user_id, action) VALUES (?, ?)", [user_id, `Added Test Schedule ID-${insertedId}`]);
 
     return res.status(201).json({
       status: 201,
       msg: "Create Test Schedule successfully",
       data: { id: insertedId },
     });
-
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
@@ -96,11 +114,21 @@ export const submitTestSchedule = async (req, res) => {
 
 // UPDATE
 export const updateTestSchedule = async (req, res) => {
-  const { id } = req.params;
-  const { tanggal_tes, jam_mulai, jam_selesai, informasi_ruangan, id_gelombang } = req.body;
-
   try {
+    const { id } = req.params;
+    const { tanggal_tes, jam_mulai, jam_selesai, informasi_ruangan, id_gelombang } = req.body;
+    console.log(req.body);
     const user_id = req.user_id;
+
+    if (jam_mulai >= jam_selesai) {
+      return res.status(400).json({ msg: "jam_mulai must be earlier than jam_selesai" });
+    }
+
+    const [gel] = await db.query("SELECT id FROM student_registration WHERE id = ?", [id_gelombang]);
+
+    if (gel.length === 0) {
+      return res.status(400).json({ msg: "Invalid id_gelombang" });
+    }
 
     const sql = `
       UPDATE test_schedule SET
@@ -112,32 +140,18 @@ export const updateTestSchedule = async (req, res) => {
       WHERE id = ?
     `;
 
-    const [result] = await db.execute(sql, [
-      tanggal_tes,
-      jam_mulai,
-      jam_selesai,
-      informasi_ruangan,
-      id_gelombang,
-      id
-    ]);
+    const [result] = await db.execute(sql, [tanggal_tes, jam_mulai, jam_selesai, informasi_ruangan, id_gelombang, id]);
 
     if (result.affectedRows === 0) {
-      return res.status(404).json({
-        status: 404,
-        msg: "Data not found",
-      });
+      return res.status(404).json({ status: 404, msg: "Data not found" });
     }
 
-    await db.query(
-      "INSERT INTO user_logs (user_id, action) VALUES (?, ?)",
-      [user_id, `Update Test Schedule ID-${id}`]
-    );
+    await db.query("INSERT INTO user_logs (user_id, action) VALUES (?, ?)", [user_id, `Update Test Schedule ID-${id}`]);
 
     return res.status(200).json({
       status: 200,
       msg: "Update Test Schedule Successfully",
     });
-
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
@@ -145,30 +159,22 @@ export const updateTestSchedule = async (req, res) => {
 
 // DELETE
 export const deleteTestSchedule = async (req, res) => {
-  const { id } = req.params;
-
   try {
+    const { id } = req.params;
     const user_id = req.user_id;
 
     const [result] = await db.execute("DELETE FROM test_schedule WHERE id = ?", [id]);
 
     if (result.affectedRows === 0) {
-      return res.status(404).json({
-        status: 404,
-        msg: "Data not found",
-      });
+      return res.status(404).json({ status: 404, msg: "Data not found" });
     }
 
-    await db.query(
-      "INSERT INTO user_logs (user_id, action) VALUES (?, ?)",
-      [user_id, `Delete Test Schedule ID-${id}`]
-    );
+    await db.query("INSERT INTO user_logs (user_id, action) VALUES (?, ?)", [user_id, `Delete Test Schedule ID-${id}`]);
 
     return res.status(200).json({
       status: 200,
       msg: "Delete Test Schedule Successfully",
     });
-
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }

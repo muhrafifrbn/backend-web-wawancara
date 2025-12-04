@@ -1,27 +1,26 @@
 import express from "express";
-import {
-  getTestSchedule,
-  getTestScheduleById,
-  submitTestSchedule,
-  updateTestSchedule,
-  deleteTestSchedule
-} from "../controllers/testScheduleController.js";
 
+import { getTestSchedule, getTestScheduleById, submitTestSchedule, updateTestSchedule, deleteTestSchedule } from "../controllers/testScheduleController.js";
+
+import { validateCreateTestSchedule, validateUpdateTestSchedule, idValidator } from "../middlewares/validators/testScheduleValidator.js";
+
+import { validate } from "../middlewares/validateMiddleware.js";
 import { verifyToken, verifyAdmin } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
-
-// Panitia and Admin Can Use
+// Panitia + Admin
 router.get("/", verifyToken, getTestSchedule);
 
-router.get("/:id", verifyToken, getTestScheduleById);
+router.get("/:id", verifyToken, idValidator, validate, getTestScheduleById);
 
-router.post("/create", verifyToken, verifyAdmin, submitTestSchedule);
+// Admin - CREATE
+router.post("/create", verifyToken, verifyAdmin, validateCreateTestSchedule, validate, submitTestSchedule);
 
-// Admin only
-router.put("/update/:id", verifyToken, verifyAdmin, updateTestSchedule);
+// Admin - UPDATE
+router.put("/update/:id", verifyToken, verifyAdmin, validateUpdateTestSchedule, validate, updateTestSchedule);
 
-router.delete("/delete/:id", verifyToken, verifyAdmin, deleteTestSchedule);
+// Admin - DELETE
+router.delete("/delete/:id", verifyToken, verifyAdmin, idValidator, validate, deleteTestSchedule);
 
 export default router;
