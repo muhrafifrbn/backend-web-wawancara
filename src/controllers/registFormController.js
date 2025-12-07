@@ -22,19 +22,37 @@ export const getRegistrationForm = async (req, res) => {
 };
 
 export const submitRegistrationForm = async (req, res) => {
-  const { jurusan_dipilih, nama_lengkap, tempat_lahir, tanggal_lahir, jenis_kelamin, agama, sekolah_asal, alamat, telepon, email, nama_ayah, nama_ibu, id_gelombang } = req.body;
+  const { jurusan_dipilih, nama_lengkap, tempat_lahir, tanggal_lahir, jenis_kelamin, agama, sekolah_asal, alamat, telepon, email, nama_ayah, nama_ibu } = req.body;
 
   try {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, "0");
-    const day = String(now.getDate()).padStart(2, "0");
-    const dateCode = `${year}${month}${day}`;
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, "0");
+    const dd = String(today.getDate()).padStart(2, "0");
+    const todayStr = `${yyyy}-${mm}-${dd}`;
+
+    const [gelombang] = await db.query(
+      `
+        SELECT id 
+        FROM student_registration
+        WHERE tanggal_mulai <= ? AND tanggal_akhir >= ?
+        LIMIT 1
+      `,
+      [todayStr, todayStr]
+    );
+
+    if (gelombang.length === 0) {
+      return res.status(400).json({
+        message: "Tidak ada gelombang PPDB yang sedang dibuka.",
+      });
+    }
+
+    const id_gelombang = gelombang[0].id;
+
+    const dateCode = `${yyyy}${mm}${dd}`;
 
     const [rows] = await db.query("SELECT COUNT(*) AS total FROM registration_form");
-
     const nextNumber = rows[0].total + 1;
-
     const counter = String(nextNumber).padStart(4, "0");
 
     const nomor_formulir = `PPDB${dateCode}${counter}`;
@@ -49,11 +67,9 @@ export const submitRegistrationForm = async (req, res) => {
 
     const [result] = await db.execute(sql, [nomor_formulir, jurusan_dipilih, nama_lengkap, tempat_lahir, tanggal_lahir, jenis_kelamin, agama, sekolah_asal, alamat, telepon, email, nama_ayah, nama_ibu, id_gelombang]);
 
-    const newId = result.insertId;
-
     return res.status(201).json({
       message: "Create Registration Form successfully",
-      data: { id: newId, nomor_formulir },
+      data: { id: result.insertId, nomor_formulir, id_gelombang },
     });
   } catch (error) {
     return res.status(500).json({ error: error.message });
