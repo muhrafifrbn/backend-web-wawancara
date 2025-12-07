@@ -5,7 +5,9 @@ import db from "../config/db.js";
 
 dotenv.config();
 
-// ======================= TOKEN GENERATOR ======================= //
+// Ini Authentication untuk mobile cuy
+
+// ======================= TOKEN  ======================= //
 const generateAccessToken = (form) => {
   return jwt.sign(
     {
@@ -30,7 +32,7 @@ const generateRefreshToken = (form) => {
   );
 };
 
-// ======================= LOGIN SISWA ======================= //
+// ======================= LOGIN  ======================= //
 export const loginRegistForm = async (req, res) => {
   try {
     const { nomor_formulir, tanggal_lahir } = req.body;
@@ -113,7 +115,7 @@ export const refreshTokenRegistForm = async (req, res) => {
   });
 };
 
-// ======================= LOGOUT SISWA ======================= //
+// ======================= LOGOUT ======================= //
 export const logoutRegistForm = async (req, res) => {
   try {
     const formId = req.form_id; // Data dari middleware auth
