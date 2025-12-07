@@ -22,8 +22,15 @@ export const verifyToken = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET || "SECRETBEBAS");
     // Simpan user ID di request agar bisa digunakan di controller lain (untuk logging)
-    req.user = decoded;
-    req.user_id = decoded.id;
+
+    if (decoded.nomor_formulir) {
+      req.nomor_formulir = decoded.nomor_formulir;
+      req.id_gelombang = decoded.id_gelombang;
+      req.form_id = decoded.id;
+    } else {
+      req.user = decoded;
+      req.user_id = decoded.id;
+    }
 
     next();
   } catch (error) {
@@ -46,7 +53,7 @@ export const verifyAdmin = (req, res, next) => {
 
 export const verifyFormNumber = async (req, res, next) => {
   try {
-    const nomor_formulir = req.headers["x-form-number"] || req.body.nomor_formulir || req.query.nomor_formulir;
+    const nomor_formulir = req.nomor_formulir;
 
     if (!nomor_formulir) {
       return res.status(400).json({

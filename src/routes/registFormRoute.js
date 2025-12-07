@@ -7,8 +7,8 @@ const router = express.Router();
 
 // for mobile
 router.post("/mobile/create", submitRegistrationForm);
-router.get("/mobile/detail/:id", verifyFormNumber, getRegistrationFormById);
-router.put("/mobile/update/:id", verifyFormNumber, updateRegistrationForm);
+router.get("/mobile/detail/:id", verifyToken, verifyFormNumber, getRegistrationFormById);
+router.put("/mobile/update/:id", verifyToken, verifyFormNumber, updateRegistrationForm);
 
 // for web
 router.get("/", verifyToken, getRegistrationForm);
