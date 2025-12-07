@@ -98,3 +98,70 @@ export const getRegistrationFormById = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
+
+export const updateRegistrationForm = async (req, res) => {
+  const { id } = req.params;
+
+  const { jurusan_dipilih, nama_lengkap, tempat_lahir, tanggal_lahir, jenis_kelamin, agama, sekolah_asal, alamat, telepon, email, nama_ayah, nama_ibu } = req.body;
+
+  try {
+    const sql = `
+      UPDATE registration_form SET
+        jurusan_dipilih = ?,
+        nama_lengkap = ?,
+        tempat_lahir = ?,
+        tanggal_lahir = ?,
+        jenis_kelamin = ?,
+        agama = ?,
+        sekolah_asal = ?,
+        alamat = ?,
+        telepon = ?,
+        email = ?,
+        nama_ayah = ?,
+        nama_ibu = ?
+      WHERE id = ?
+    `;
+
+    const [result] = await db.execute(sql, [jurusan_dipilih, nama_lengkap, tempat_lahir, tanggal_lahir, jenis_kelamin, agama, sekolah_asal, alamat, telepon, email, nama_ayah, nama_ibu, id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        status: 404,
+        msg: "Data not found",
+      });
+    }
+
+    return res.status(200).json({
+      status: 200,
+      msg: "Update Registration Form Successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+export const deleteRegistrationForm = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const user_id = req.user_id;
+
+    const [result] = await db.execute("DELETE FROM registration_form WHERE id = ?", [id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        status: 404,
+        msg: "Data not found",
+      });
+    }
+
+    await db.query("INSERT INTO user_logs (user_id, action) VALUES (?,?)", [user_id, `Deleted Registration Form ID-${id}`]);
+
+    return res.status(200).json({
+      status: 200,
+      msg: "Delete Registration Form Successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
