@@ -37,6 +37,10 @@ export const loginRegistForm = async (req, res) => {
   try {
     const { nomor_formulir, tanggal_lahir } = req.body;
 
+    console.log({
+      nomor_formulir,
+      tanggal_lahir,
+    });
     const [rows] = await db.query(
       `
         SELECT 
