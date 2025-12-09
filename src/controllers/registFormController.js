@@ -3,19 +3,20 @@ import db from "../config/db.js";
 export const getRegistrationForm = async (req, res) => {
   try {
     const [result] = await db.query(`
-      SELECT *
+      SELECT id, nomor_formulir, nama_lengkap, jurusan_dipilih, tanggal_lahir, jenis_kelamin, email
       FROM registration_form
       ORDER BY id DESC
     `);
 
     return res.status(200).json({
       status: 200,
-      msg: "Success Get Registration Form Data",
+      message: "Success Get Registration Form Data",
       data: result,
     });
   } catch (error) {
     return res.status(500).json({
-      msg: "Failed to retrieve data",
+      status: 500,
+      message: "Failed to retrieve data",
       error: error.message,
     });
   }
@@ -23,7 +24,6 @@ export const getRegistrationForm = async (req, res) => {
 
 export const submitRegistrationForm = async (req, res) => {
   const { jurusan_dipilih, nama_lengkap, tempat_lahir, tanggal_lahir, jenis_kelamin, agama, sekolah_asal, alamat, telepon, email, nama_ayah, nama_ibu } = req.body;
-
   try {
     const today = new Date();
     const yyyy = today.getFullYear();
@@ -35,7 +35,7 @@ export const submitRegistrationForm = async (req, res) => {
       `
         SELECT id 
         FROM student_registration
-        WHERE tanggal_mulai <= ? AND tanggal_akhir >= ?
+        WHERE tanggal_mulai <= ? AND tanggal_akhir >= ? AND status_gelombang = 'Aktif'
         LIMIT 1
       `,
       [todayStr, todayStr]
@@ -43,6 +43,7 @@ export const submitRegistrationForm = async (req, res) => {
 
     if (gelombang.length === 0) {
       return res.status(400).json({
+        status: 400,
         message: "Tidak ada gelombang PPDB yang sedang dibuka.",
       });
     }
@@ -51,11 +52,13 @@ export const submitRegistrationForm = async (req, res) => {
 
     const dateCode = `${yyyy}${mm}${dd}`;
 
-    const [rows] = await db.query("SELECT COUNT(*) AS total FROM registration_form");
-    const nextNumber = rows[0].total + 1;
-    const counter = String(nextNumber).padStart(4, "0");
+    const [last] = await db.query(`
+      SELECT id FROM registration_form ORDER BY id DESC LIMIT 1
+    `);
 
-    const nomor_formulir = `PPDB${dateCode}${counter}`;
+    const nextID = last.length === 0 ? 1 : last[0].id + 1;
+
+    const nomor_formulir = `PPDB${dateCode}${String(nextID).padStart(4, "0")}`;
 
     const sql = `
       INSERT INTO registration_form (
@@ -68,11 +71,15 @@ export const submitRegistrationForm = async (req, res) => {
     const [result] = await db.execute(sql, [nomor_formulir, jurusan_dipilih, nama_lengkap, tempat_lahir, tanggal_lahir, jenis_kelamin, agama, sekolah_asal, alamat, telepon, email, nama_ayah, nama_ibu, id_gelombang]);
 
     return res.status(201).json({
+      status: 201,
       message: "Create Registration Form successfully",
       data: { id: result.insertId, nomor_formulir, id_gelombang },
     });
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return res.status(500).json({
+      status: 500,
+      error: error.message,
+    });
   }
 };
 
@@ -80,22 +87,25 @@ export const getRegistrationFormById = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const [rows] = await db.query(`SELECT * FROM registration_form WHERE id = ?`, [id]);
+    const [rows] = await db.query(`SELECT * FROM registration_form WHERE id = ? LIMIT 1`, [id]);
 
     if (rows.length === 0) {
       return res.status(404).json({
         status: 404,
-        msg: "Data not found",
+        message: "Data not found",
       });
     }
 
     return res.status(200).json({
       status: 200,
-      msg: "Success Get Data",
+      message: "Success Get Data",
       data: rows[0],
     });
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return res.status(500).json({
+      status: 500,
+      error: error.message,
+    });
   }
 };
 
@@ -127,16 +137,19 @@ export const updateRegistrationForm = async (req, res) => {
     if (result.affectedRows === 0) {
       return res.status(404).json({
         status: 404,
-        msg: "Data not found",
+        message: "Data not found",
       });
     }
 
     return res.status(200).json({
       status: 200,
-      msg: "Update Registration Form Successfully",
+      message: "Update Registration Form Successfully",
     });
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return res.status(500).json({
+      status: 500,
+      error: error.message,
+    });
   }
 };
 
@@ -151,7 +164,7 @@ export const deleteRegistrationForm = async (req, res) => {
     if (result.affectedRows === 0) {
       return res.status(404).json({
         status: 404,
-        msg: "Data not found",
+        message: "Data not found",
       });
     }
 
@@ -159,9 +172,12 @@ export const deleteRegistrationForm = async (req, res) => {
 
     return res.status(200).json({
       status: 200,
-      msg: "Delete Registration Form Successfully",
+      message: "Delete Registration Form Successfully",
     });
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return res.status(500).json({
+      status: 500,
+      error: error.message,
+    });
   }
 };

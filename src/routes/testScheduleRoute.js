@@ -1,13 +1,16 @@
 import express from "express";
 
-import { getTestSchedule, getTestScheduleById, submitTestSchedule, updateTestSchedule, deleteTestSchedule } from "../controllers/testScheduleController.js";
+import { getTestSchedule, getTestScheduleById, submitTestSchedule, updateTestSchedule, deleteTestSchedule, getTestScheduleByIdGelombang } from "../controllers/testScheduleController.js";
 
 import { validateCreateTestSchedule, validateUpdateTestSchedule, idValidator } from "../middlewares/validators/testScheduleValidator.js";
 
 import { validate } from "../middlewares/validateMiddleware.js";
-import { verifyToken, verifyAdmin } from "../middlewares/authMiddleware.js";
+import { verifyToken, verifyAdmin, verifyFormNumber } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
+
+// mobile
+router.get("/mobile/detail/:id", verifyToken, verifyFormNumber, getTestScheduleByIdGelombang);
 
 // Panitia + Admin
 router.get("/", verifyToken, getTestSchedule);

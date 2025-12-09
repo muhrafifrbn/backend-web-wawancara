@@ -1,5 +1,6 @@
 import express from "express";
 import { getRegistrationForm, getRegistrationFormById, submitRegistrationForm, updateRegistrationForm, deleteRegistrationForm } from "../controllers/registFormController.js";
+import { getInformationById } from "../controllers/informationRegistController.js";
 
 import { verifyToken, verifyAdmin, verifyFormNumber } from "../middlewares/authMiddleware.js";
 
@@ -9,6 +10,7 @@ const router = express.Router();
 router.post("/mobile/create", submitRegistrationForm);
 router.get("/mobile/detail/:id", verifyToken, verifyFormNumber, getRegistrationFormById);
 router.put("/mobile/update/:id", verifyToken, verifyFormNumber, updateRegistrationForm);
+
 
 // for web
 router.get("/", verifyToken, getRegistrationForm);
