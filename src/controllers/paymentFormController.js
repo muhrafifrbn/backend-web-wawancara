@@ -167,3 +167,29 @@ export const deletePaymentForm = async (req, res) => {
     });
   }
 };
+
+export const getPaymentFormByIdFormulir = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const [rows] = await db.query(`SELECT * FROM payment_form WHERE id_formulir = ? LIMIT 1`, [id]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({
+        status: 404,
+        message: "Payment data not found",
+      });
+    }
+
+    return res.status(200).json({
+      status: 200,
+      message: "Success Get Payment Data",
+      data: rows[0],
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: 500,
+      error: error.message,
+    });
+  }
+};
