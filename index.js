@@ -14,6 +14,8 @@ import registrationRoutes from "./src/routes/registrationRoutes.js";
 import informationRegistRoutes from "./src/routes/informationRegistRoute.js";
 import informationTestRoutes from "./src/routes/informationTestRoute.js";
 import testScheduleRoutes from "./src/routes/testScheduleRoute.js";
+import registrationFormRoutes from "./src/routes/registFormRoute.js";
+import authMobileRoute from "./src/routes/authMobileRoute.js";
 
 const app = express();
 
@@ -37,6 +39,8 @@ app.use("/api/registration", registrationRoutes);
 app.use("/api/information/registration", informationRegistRoutes);
 app.use("/api/information/test", informationTestRoutes);
 app.use("/api/information/schedule-test", testScheduleRoutes);
+app.use("/api/regist-form", registrationFormRoutes);
+app.use("/api/auth-mobile", authMobileRoute);
 app.use(indexRoutes);
 
 const PORT = process.env.PORT || 5500;

@@ -179,3 +179,43 @@ export const deleteTestSchedule = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
+
+// GET BY ID Gelombang
+export const getTestScheduleByIdGelombang = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const [rows] = await db.query(
+      `
+      SELECT 
+        ts.id, 
+        ts.tanggal_tes, 
+        ts.jam_mulai, 
+        ts.jam_selesai, 
+        ts.informasi_ruangan, 
+        ts.id_gelombang,
+        sr.nama_gelombang
+      FROM test_schedule ts
+      LEFT JOIN student_registration sr 
+            ON ts.id_gelombang = sr.id
+      WHERE sr.id = ?
+      `,
+      [id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({
+        status: 404,
+        msg: "Data not found",
+      });
+    }
+
+    return res.status(200).json({
+      status: 200,
+      msg: "Success Get Data",
+      data: rows[0],
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};

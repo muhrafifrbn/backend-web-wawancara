@@ -1,13 +1,16 @@
 import express from "express";
-import { getInformationRegist, getInformationById, submitInformationRegist, updateInformationRegist, deleteInformationRegist } from "../controllers/informationRegistController.js";
+import { getInformationRegist, getActiveRegistrationWave, getInformationById, submitInformationRegist, updateInformationRegist, deleteInformationRegist } from "../controllers/informationRegistController.js";
 
 import { createInformationRegistValidator, updateInformationRegistValidator, idValidator } from "../middlewares/validators/informationRegistValidator.js";
 
 import { validate } from "../middlewares/validateMiddleware.js";
 
-import { verifyToken, verifyAdmin } from "../middlewares/authMiddleware.js";
+import { verifyToken, verifyAdmin, verifyFormNumber } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
+
+// mobile
+router.get("/mobile", verifyFormNumber, getActiveRegistrationWave);
 
 // Panitia and Admin Can Use
 router.get("/", verifyToken, getInformationRegist);

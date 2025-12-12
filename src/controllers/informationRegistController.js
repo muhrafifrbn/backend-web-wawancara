@@ -50,8 +50,11 @@ export const getInformationById = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const [rows] = await db.query(`SELECT id, nama_gelombang, deskripsi, tanggal_mulai,  tanggal_akhir,
-      tahun_ajaran,  status_gelombang  FROM student_registration WHERE id = ?`, [id]);
+    const [rows] = await db.query(
+      `SELECT id, nama_gelombang, deskripsi, tanggal_mulai,  tanggal_akhir,
+      tahun_ajaran,  status_gelombang  FROM student_registration WHERE id = ?`,
+      [id]
+    );
 
     if (rows.length === 0) {
       return res.status(404).json({
@@ -133,5 +136,46 @@ export const deleteInformationRegist = async (req, res) => {
     });
   } catch (error) {
     return res.status(500).json({ error: error.message });
+  }
+};
+
+export const getActiveRegistrationWave = async (req, res) => {
+  try {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, "0");
+    const dd = String(today.getDate()).padStart(2, "0");
+    const todayStr = `${yyyy}-${mm}-${dd}`;
+
+    const [result] = await db.query(
+      `
+      SELECT id, nama_gelombang, deskripsi, tanggal_mulai, tanggal_akhir,
+             tahun_ajaran, status_gelombang
+      FROM student_registration
+      WHERE tanggal_mulai <= ? 
+        AND tanggal_akhir >= ?
+      LIMIT 1
+      `,
+      [todayStr, todayStr]
+    );
+
+    if (result.length === 0) {
+      return res.status(404).json({
+        status: 404,
+        msg: "Tidak ada gelombang PPDB yang aktif saat ini.",
+        data: null,
+      });
+    }
+
+    return res.status(200).json({
+      status: 200,
+      msg: "Success Get Active Registration Wave",
+      data: result[0],
+    });
+  } catch (error) {
+    return res.status(500).json({
+      msg: "Failed to retrieve active wave",
+      error: error.message,
+    });
   }
 };
