@@ -16,6 +16,7 @@ import informationTestRoutes from "./src/routes/informationTestRoute.js";
 import testScheduleRoutes from "./src/routes/testScheduleRoute.js";
 import registrationFormRoutes from "./src/routes/registFormRoute.js";
 import authMobileRoute from "./src/routes/authMobileRoute.js";
+import paymentFormRoute from "./src/routes/paymentFormRoute.js";
 
 const app = express();
 
@@ -27,6 +28,8 @@ app.use(
 );
 app.use(bodyParser.json());
 app.use(cookieParser());
+
+app.use("/uploads/payment", express.static("public/payment_form"));
 
 app.use("/api/students", studentRoutes);
 app.use("/api/parents", parentRoutes);
@@ -41,12 +44,14 @@ app.use("/api/information/test", informationTestRoutes);
 app.use("/api/information/schedule-test", testScheduleRoutes);
 app.use("/api/regist-form", registrationFormRoutes);
 app.use("/api/auth-mobile", authMobileRoute);
+app.use("/api/payment-form", paymentFormRoute);
 app.use(indexRoutes);
 
 const PORT = process.env.PORT || 5500;
 // app.listen(PORT, () => {
 //   console.log(`Server running on port http://localhost:${PORT}`);
 // });
+
 app.listen(PORT, "0.0.0.0", () => {
   //change the ip add on your host ip (use i>
   console.log(`Server running on port  localhost:${PORT}`);
