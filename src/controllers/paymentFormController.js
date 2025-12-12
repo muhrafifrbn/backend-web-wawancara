@@ -88,7 +88,7 @@ export const submitPaymentForm = async (req, res) => {
 export const updatePaymentForm = async (req, res) => {
   const { id } = req.params;
 
-  const { nama_tagihan, nama_bank, tanggal_transfer, jumlah_tagihan, konfirmasi_pembayaran, id_formulir } = req.body;
+  const { nama_tagihan, nama_bank, tanggal_transfer, jumlah_tagihan, id_formulir } = req.body;
 
   try {
     // Ambil data lama
@@ -117,12 +117,11 @@ export const updatePaymentForm = async (req, res) => {
         bukti_bayar = ?,
         tanggal_transfer = ?,
         jumlah_tagihan = ?,
-        konfirmasi_pembayaran = ?,
         id_formulir = ?
       WHERE id = ?
     `;
 
-    const [result] = await db.execute(sql, [nama_tagihan, nama_bank, bukti_bayar, tanggal_transfer, jumlah_tagihan, konfirmasi_pembayaran, id_formulir, id]);
+    const [result] = await db.execute(sql, [nama_tagihan, nama_bank, bukti_bayar, tanggal_transfer, jumlah_tagihan, id_formulir, id]);
 
     return res.status(200).json({
       status: 200,
