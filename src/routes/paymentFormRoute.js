@@ -4,12 +4,15 @@ import { getPaymentForm, getPaymentFormById, submitPaymentForm, updatePaymentFor
 import { uploadPaymentProof } from "../middlewares/uploadPaymentMiddleware.js";
 import { verifyToken, verifyFormNumber } from "../middlewares/authMiddleware.js";
 
+import { idParamValidation, createPaymentValidation, updatePaymentValidation } from "../middlewares/validators/paymentFormValidator.js";
+import { validate } from "../middlewares/validateMiddleware.js";
+
 const router = express.Router();
 
 // for mobile
-router.get("/mobile/detail/:id", verifyToken, verifyFormNumber, getPaymentFormByIdFormulir);
-router.post("/mobile/create", uploadPaymentProof.single("bukti_bayar"), verifyToken, verifyFormNumber, submitPaymentForm);
-router.put("/mobile/update/:id", uploadPaymentProof.single("bukti_bayar"), verifyToken, verifyFormNumber, updatePaymentForm);
+router.get("/mobile/detail/:id", verifyToken, verifyFormNumber, idParamValidation, validate, getPaymentFormByIdFormulir);
+router.post("/mobile/create", verifyToken, verifyFormNumber, uploadPaymentProof.single("bukti_bayar"), createPaymentValidation, validate, submitPaymentForm);
+router.put("/mobile/update/:id", verifyToken, verifyFormNumber, idParamValidation, validate, uploadPaymentProof.single("bukti_bayar"), updatePaymentForm);
 
 // for web
 // router.delete("/:id", deletePaymentForm);
