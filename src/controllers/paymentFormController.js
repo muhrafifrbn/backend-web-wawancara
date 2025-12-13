@@ -88,7 +88,7 @@ export const submitPaymentForm = async (req, res) => {
 export const updatePaymentForm = async (req, res) => {
   const { id } = req.params;
 
-  const { nama_tagihan, nama_bank, tanggal_transfer, jumlah_tagihan, id_formulir } = req.body;
+  const { nama_tagihan, nama_bank, tanggal_transfer, jumlah_tagihan } = req.body;
 
   try {
     // Ambil data lama
@@ -116,12 +116,11 @@ export const updatePaymentForm = async (req, res) => {
         nama_bank = ?,
         bukti_bayar = ?,
         tanggal_transfer = ?,
-        jumlah_tagihan = ?,
-        id_formulir = ?
-      WHERE id = ?
+        jumlah_tagihan = ?
+        WHERE id = ?
     `;
 
-    const [result] = await db.execute(sql, [nama_tagihan, nama_bank, bukti_bayar, tanggal_transfer, jumlah_tagihan, id_formulir, id]);
+    const [result] = await db.execute(sql, [nama_tagihan, nama_bank, bukti_bayar, tanggal_transfer, jumlah_tagihan, id]);
 
     return res.status(200).json({
       status: 200,
@@ -185,6 +184,56 @@ export const getPaymentFormByIdFormulir = async (req, res) => {
       status: 200,
       message: "Success Get Payment Data",
       data: rows[0],
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: 500,
+      error: error.message,
+    });
+  }
+};
+
+export const updateConfirmPayment = async (req, res) => {
+  const { id } = req.params;
+  const { konfirmasi_pembayaran } = req.body;
+
+  try {
+    // Validasi nilai
+    if (![0, 1].includes(Number(konfirmasi_pembayaran))) {
+      return res.status(400).json({
+        status: 400,
+        message: "konfirmasi_pembayaran harus bernilai 0 atau 1",
+      });
+    }
+
+    const [result] = await db.execute(
+      `
+      UPDATE payment_form
+      SET konfirmasi_pembayaran = ?
+      WHERE id = ?
+      LIMIT 1
+      `,
+      [konfirmasi_pembayaran, id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        status: 404,
+        message: "Payment data not found",
+      });
+    }
+
+    const user_id = req.user_id;
+
+    await db.query("INSERT INTO user_logs (user_id, action) VALUES (?,?)", [user_id, `Updated Confirm Payment ID-${id}`]);
+
+    return res.status(200).json({
+      status: 200,
+      message: "Konfirmasi pembayaran berhasil diperbarui",
+      data: {
+        id,
+        konfirmasi_pembayaran,
+      },
     });
   } catch (error) {
     return res.status(500).json({
