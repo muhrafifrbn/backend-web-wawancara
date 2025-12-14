@@ -4,13 +4,15 @@ import { getInformationById } from "../controllers/informationRegistController.j
 
 import { verifyToken, verifyAdmin, verifyFormNumber } from "../middlewares/authMiddleware.js";
 
+import { validate } from "../middlewares/validateMiddleware.js";
+import { createRegistrationValidation, idParamValidation, updateRegistrationValidation } from "../middlewares/validators/registFormValidator.js";
+
 const router = express.Router();
 
 // for mobile
-router.post("/mobile/create", submitRegistrationForm);
-router.get("/mobile/detail/:id", verifyToken, verifyFormNumber, getRegistrationFormById);
-router.put("/mobile/update/:id", verifyToken, verifyFormNumber, updateRegistrationForm);
-
+router.post("/mobile/create", createRegistrationValidation, validate, submitRegistrationForm);
+router.get("/mobile/detail/:id", verifyToken, verifyFormNumber, idParamValidation, validate, getRegistrationFormById);
+router.put("/mobile/update/:id", verifyToken, verifyFormNumber, updateRegistrationValidation, validate, updateRegistrationForm);
 
 // for web
 router.get("/", verifyToken, getRegistrationForm);
