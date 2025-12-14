@@ -17,8 +17,47 @@ const fileFilter = (req, file, cb) => {
   if (allowed.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error("File must be JPG/PNG"));
+    cb(new Error("bukti_bayar harus berupa JPG / PNG / JPEG"));
   }
 };
 
-export const uploadPaymentProof = multer({ storage, fileFilter });
+export const multerErrorHandler = (err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    let message = err.message;
+
+    if (err.code === "LIMIT_FILE_SIZE") {
+      message = "Ukuran file maksimal 2MB";
+    }
+
+    if (err.code === "LIMIT_UNEXPECTED_FILE") {
+      message = "Hanya boleh upload 1 file bukti_bayar";
+    }
+
+    if (err.code === "LIMIT_FILE_COUNT") {
+      message = "Hanya boleh upload 1 file bukti_bayar";
+    }
+
+    return res.status(400).json({
+      status: 400,
+      message,
+    });
+  }
+
+  if (err instanceof Error) {
+    return res.status(400).json({
+      status: 400,
+      message: err.message,
+    });
+  }
+
+  next(err);
+};
+
+export const uploadPaymentProof = multer({
+  storage,
+  fileFilter,
+  limits: {
+    fileSize: 2 * 1024 * 1024, // 2MB
+    files: 1,
+  },
+});
