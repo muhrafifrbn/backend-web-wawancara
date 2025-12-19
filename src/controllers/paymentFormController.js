@@ -51,7 +51,7 @@ export const getPaymentFormById = async (req, res) => {
 };
 
 export const submitPaymentForm = async (req, res) => {
-  const { nama_tagihan, nama_bank, tanggal_transfer, jumlah_tagihan, id_formulir } = req.body;
+  const { nama_bank, tanggal_transfer, jumlah_tagihan, id_formulir } = req.body;
 
   try {
     if (!req.file) {
@@ -62,6 +62,7 @@ export const submitPaymentForm = async (req, res) => {
     }
 
     const bukti_bayar = req.file.filename;
+    const nama_tagihan = "Tagihan Formulir PPDB";
 
     const sql = `
       INSERT INTO payment_form (
@@ -88,7 +89,7 @@ export const submitPaymentForm = async (req, res) => {
 export const updatePaymentForm = async (req, res) => {
   const { id } = req.params;
 
-  const { nama_tagihan, nama_bank, tanggal_transfer, jumlah_tagihan } = req.body;
+  const { nama_bank, tanggal_transfer, jumlah_tagihan } = req.body;
 
   try {
     // Ambil data lama
@@ -112,7 +113,6 @@ export const updatePaymentForm = async (req, res) => {
 
     const sql = `
       UPDATE payment_form SET
-        nama_tagihan = ?,
         nama_bank = ?,
         bukti_bayar = ?,
         tanggal_transfer = ?,
@@ -120,7 +120,7 @@ export const updatePaymentForm = async (req, res) => {
         WHERE id = ?
     `;
 
-    const [result] = await db.execute(sql, [nama_tagihan, nama_bank, bukti_bayar, tanggal_transfer, jumlah_tagihan, id]);
+    const [result] = await db.execute(sql, [nama_bank, bukti_bayar, tanggal_transfer, jumlah_tagihan, id]);
 
     return res.status(200).json({
       status: 200,

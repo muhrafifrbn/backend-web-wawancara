@@ -12,23 +12,21 @@ const paymentIdExists = async (id) => {
 };
 
 export const createPaymentValidation = [
-  body("nama_tagihan").notEmpty().withMessage("nama_tagihan wajib diisi"),
-
   body("nama_bank").notEmpty().withMessage("nama_bank wajib diisi"),
 
   body("tanggal_transfer").notEmpty().withMessage("tanggal_transfer wajib diisi").isISO8601().withMessage("tanggal_transfer harus format YYYY-MM-DD"),
 
-  body("jumlah_tagihan")
-    .notEmpty()
-    .withMessage("jumlah_tagihan wajib diisi")
-    .isNumeric()
-    .withMessage("jumlah_tagihan harus berupa angka")
-    .custom((value) => {
-      if (Number(value) <= 0) {
-        throw new Error("jumlah_tagihan harus lebih dari 0");
-      }
-      return true;
-    }),
+  // body("jumlah_tagihan")
+  //   .notEmpty()
+  //   .withMessage("jumlah_tagihan wajib diisi")
+  //   .isNumeric()
+  //   .withMessage("jumlah_tagihan harus berupa angka")
+  //   .custom((value) => {
+  //     if (Number(value) <= 0) {
+  //       throw new Error("jumlah_tagihan harus lebih dari 0");
+  //     }
+  //     return true;
+  //   }),
 
   body("id_formulir").notEmpty().withMessage("id_formulir wajib diisi").isInt().withMessage("id_formulir harus berupa angka"),
 ];
@@ -36,13 +34,11 @@ export const createPaymentValidation = [
 export const updatePaymentValidation = [
   param("id").isInt().withMessage("ID tidak valid").custom(paymentIdExists),
 
-  body("nama_tagihan").notEmpty().withMessage("nama_tagihan wajib diisi"),
-
   body("nama_bank").notEmpty().withMessage("nama_bank wajib diisi"),
 
   body("tanggal_transfer").notEmpty().withMessage("tanggal_transfer wajib diisi").isISO8601().withMessage("tanggal_transfer harus format YYYY-MM-DD"),
 
-  body("jumlah_tagihan").notEmpty().withMessage("jumlah_tagihan wajib diisi").isNumeric().withMessage("jumlah_tagihan harus berupa angka"),
+  // body("jumlah_tagihan").notEmpty().withMessage("jumlah_tagihan wajib diisi").isNumeric().withMessage("jumlah_tagihan harus berupa angka"),
 ];
 
 export const confirmPaymentValidation = [
