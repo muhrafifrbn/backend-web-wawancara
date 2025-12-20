@@ -32,7 +32,7 @@ export const submitInformationRegist = async (req, res) => {
       VALUES (?, ?, ?, ?, ?, ?)
     `;
 
-    const [result] = await db.execute(sql, [nama_gelombang, deskripsi, tanggal_mulai, tanggal_akhir, tahun_ajaran, "aktif"]);
+    const [result] = await db.execute(sql, [nama_gelombang, deskripsi, tanggal_mulai, tanggal_akhir, tahun_ajaran, "Aktif"]);
 
     const informationRegistId = result.insertId;
 

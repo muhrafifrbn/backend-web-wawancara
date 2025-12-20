@@ -20,9 +20,15 @@ export const createInformationRegistValidator = [
     return true;
   }),
 
-  body("tahun_ajaran").notEmpty().withMessage("Tahun ajaran wajib diisi").isLength({ max: 10 }).withMessage("Tahun ajaran maksimal 10 karakter").matches(/^\d{4}[-/]\d{4}$/).withMessage("Format tahun ajaran harus YYYY/YYYY atau YYYY-YYYY"),
+  body("tahun_ajaran")
+    .notEmpty()
+    .withMessage("Tahun ajaran wajib diisi")
+    .isLength({ max: 10 })
+    .withMessage("Tahun ajaran maksimal 10 karakter")
+    .matches(/^\d{4}[-/]\d{4}$/)
+    .withMessage("Format tahun ajaran harus YYYY/YYYY atau YYYY-YYYY"),
 
-  body("status_gelombang").optional().isIn(["Aktif", "Non-Aktif"]).withMessage("Status gelombang hanya boleh: aktif, nonaktif"),
+  body("status_gelombang").optional().isIn(["Aktif", "Non-Aktif"]).withMessage("Status gelombang hanya boleh: Aktif, Non-Aktif"),
 ];
 
 export const updateInformationRegistValidator = [
@@ -47,7 +53,13 @@ export const updateInformationRegistValidator = [
     return true;
   }),
 
-  body("tahun_ajaran").notEmpty().withMessage("Tahun ajaran wajib diisi").isLength({ max: 10 }).withMessage("Tahun ajaran maksimal 10 karakter").matches(/^\d{4}[-/]\d{4}$/).withMessage("Format tahun ajaran harus YYYY/YYYY atau YYYY-YYYY"),
+  body("tahun_ajaran")
+    .notEmpty()
+    .withMessage("Tahun ajaran wajib diisi")
+    .isLength({ max: 10 })
+    .withMessage("Tahun ajaran maksimal 10 karakter")
+    .matches(/^\d{4}[-/]\d{4}$/)
+    .withMessage("Format tahun ajaran harus YYYY/YYYY atau YYYY-YYYY"),
 
   body("status_gelombang").isIn(["Aktif", "Non-Aktif"]).withMessage("Status gelombang hanya boleh: Aktif, Non-Aktif"),
 ];
