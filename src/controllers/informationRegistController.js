@@ -3,8 +3,14 @@ import db from "../config/db.js";
 export const getInformationRegist = async (req, res) => {
   try {
     const [result] = await db.query(`
-      SELECT id, nama_gelombang, deskripsi, tanggal_mulai, tanggal_akhir,
-      tahun_ajaran, status_gelombang
+      SELECT 
+        id,
+        nama_gelombang,
+        deskripsi,
+        DATE_FORMAT(tanggal_mulai, '%Y-%m-%d') AS tanggal_mulai,
+        DATE_FORMAT(tanggal_akhir, '%Y-%m-%d') AS tanggal_akhir,
+        tahun_ajaran,
+        status_gelombang
       FROM student_registration
       ORDER BY id DESC
     `);
@@ -51,8 +57,18 @@ export const getInformationById = async (req, res) => {
 
   try {
     const [rows] = await db.query(
-      `SELECT id, nama_gelombang, deskripsi, tanggal_mulai,  tanggal_akhir,
-      tahun_ajaran,  status_gelombang  FROM student_registration WHERE id = ?`,
+      `
+      SELECT 
+        id,
+        nama_gelombang,
+        deskripsi,
+        DATE_FORMAT(tanggal_mulai, '%Y-%m-%d') AS tanggal_mulai,
+        DATE_FORMAT(tanggal_akhir, '%Y-%m-%d') AS tanggal_akhir,
+        tahun_ajaran,
+        status_gelombang
+      FROM student_registration
+      WHERE id = ?
+  `,
       [id]
     );
 

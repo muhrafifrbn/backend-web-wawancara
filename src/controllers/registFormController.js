@@ -64,11 +64,11 @@ export const submitRegistrationForm = async (req, res) => {
       INSERT INTO registration_form (
         nomor_formulir, jurusan_dipilih, nama_lengkap, tempat_lahir, tanggal_lahir,
         jenis_kelamin, agama, sekolah_asal, alamat, telepon, email,
-        nama_ayah, nama_ibu, id_gelombang
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        nama_ayah, nama_ibu, hasil_lulus , id_gelombang
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
-    const [result] = await db.execute(sql, [nomor_formulir, jurusan_dipilih, nama_lengkap, tempat_lahir, tanggal_lahir, jenis_kelamin, agama, sekolah_asal, alamat, telepon, email, nama_ayah, nama_ibu, id_gelombang]);
+    const [result] = await db.execute(sql, [nomor_formulir, jurusan_dipilih, nama_lengkap, tempat_lahir, tanggal_lahir, jenis_kelamin, agama, sekolah_asal, alamat, telepon, email, nama_ayah, nama_ibu, "Belum Dikonfirmasi", id_gelombang]);
 
     return res.status(201).json({
       status: 201,
@@ -173,6 +173,52 @@ export const deleteRegistrationForm = async (req, res) => {
     return res.status(200).json({
       status: 200,
       message: "Delete Registration Form Successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: 500,
+      error: error.message,
+    });
+  }
+};
+
+export const updateHasilLulus = async (req, res) => {
+  const { id } = req.params;
+  const { hasil_lulus } = req.body;
+
+  try {
+    const user_id = req.user_id;
+
+    // validasi enum
+    const allowedStatus = ["Belum Dikonfirmasi", "Lulus", "Tidak Lulus"];
+
+    if (!allowedStatus.includes(hasil_lulus)) {
+      return res.status(400).json({
+        status: 400,
+        message: "Nilai hasil_lulus tidak valid",
+      });
+    }
+
+    const sql = `
+      UPDATE registration_form
+      SET hasil_lulus = ?
+      WHERE id = ?
+    `;
+
+    const [result] = await db.execute(sql, [hasil_lulus, id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        status: 404,
+        message: "Data not found",
+      });
+    }
+
+    await db.query("INSERT INTO user_logs (user_id, action) VALUES (?,?)", [user_id, `Update Result Test Registration Form ID-${id}`]);
+
+    return res.status(200).json({
+      status: 200,
+      message: "Update hasil kelulusan berhasil",
     });
   } catch (error) {
     return res.status(500).json({

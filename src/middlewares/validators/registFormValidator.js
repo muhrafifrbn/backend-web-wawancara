@@ -1,6 +1,22 @@
 import { body, param } from "express-validator";
+import db from "../../config/db.js";
 
-export const idParamValidation = [param("id").notEmpty().withMessage("ID wajib diisi").isInt({ min: 1 }).withMessage("ID harus berupa angka")];
+export const idParamValidation = [
+  param("id")
+    .notEmpty()
+    .withMessage("ID wajib diisi")
+    .isInt({ min: 1 })
+    .withMessage("ID harus berupa angka")
+    .custom(async (value) => {
+      const [rows] = await db.query("SELECT id FROM registration_form WHERE id = ? LIMIT 1", [value]);
+
+      if (rows.length === 0) {
+        throw new Error("ID tidak ditemukan di database");
+      }
+
+      return true;
+    }),
+];
 
 export const createRegistrationValidation = [
   body("jurusan_dipilih").notEmpty().withMessage("jurusan_dipilih wajib diisi"),
@@ -23,7 +39,7 @@ export const createRegistrationValidation = [
       return true;
     }),
 
-  body("jenis_kelamin").notEmpty().withMessage("jenis_kelamin wajib diisi").isIn(["LAKI-LAKI", "PEREMPUAN"]).withMessage("jenis_kelamin harus LAKI atau PEREMPUAN"),
+  body("jenis_kelamin").notEmpty().withMessage("jenis_kelamin wajib diisi").isIn(["LAKI-LAKI", "PEREMPUAN"]).withMessage("jenis_kelamin harus LAKI-LAKI atau PEREMPUAN"),
 
   body("agama").notEmpty().withMessage("agama wajib diisi"),
 
@@ -66,4 +82,9 @@ export const updateRegistrationValidation = [
   body("nama_ayah").notEmpty().withMessage("nama_ayah wajib diisi"),
 
   body("nama_ibu").notEmpty().withMessage("nama_ibu wajib diisi"),
+];
+
+export const updateHasilLulusValidation = [
+  ...idParamValidation,
+  body("hasil_lulus").notEmpty().withMessage("hasil_lulus wajib diisi").isIn(["Belum Dikonfirmasi", "Lulus", "Tidak Lulus"]).withMessage("hasil_lulus harus salah satu dari: Belum Dikonfirmasi, Lulus, Tidak Lulus"),
 ];
