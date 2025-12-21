@@ -11,6 +11,16 @@ const paymentIdExists = async (id) => {
   return true;
 };
 
+const paymentIdFormExists = async (id) => {
+  const [rows] = await db.query("SELECT id FROM registration_form WHERE id = ? LIMIT 1", [id]);
+
+  if (rows.length === 0) {
+    throw new Error("Data formulir tidak ditemukan");
+  }
+
+  return true;
+};
+
 export const createPaymentValidation = [
   body("nama_bank").notEmpty().withMessage("nama_bank wajib diisi"),
 
@@ -48,3 +58,5 @@ export const confirmPaymentValidation = [
 ];
 
 export const idParamValidation = [param("id").isInt().withMessage("ID harus berupa angka").custom(paymentIdExists)];
+
+export const idFormParamValidation = [param("id").isInt().withMessage("ID harus berupa angka").custom(paymentIdFormExists)];
