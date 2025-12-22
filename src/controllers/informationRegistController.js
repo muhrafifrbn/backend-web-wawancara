@@ -11,7 +11,7 @@ export const getInformationRegist = async (req, res) => {
         DATE_FORMAT(tanggal_akhir, '%Y-%m-%d') AS tanggal_akhir,
         tahun_ajaran,
         status_gelombang
-      FROM student_registration
+      FROM student_registration 
       ORDER BY id DESC
     `);
     return res.status(200).json({
@@ -166,7 +166,7 @@ export const getActiveRegistrationWave = async (req, res) => {
     const [result] = await db.query(
       `
       SELECT id, nama_gelombang, deskripsi, tanggal_mulai, tanggal_akhir,
-             tahun_ajaran, status_gelombang
+            tahun_ajaran, status_gelombang
       FROM student_registration
       WHERE tanggal_mulai <= ? 
         AND tanggal_akhir >= ?

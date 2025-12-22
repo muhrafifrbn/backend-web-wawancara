@@ -64,11 +64,11 @@ export const submitRegistrationForm = async (req, res) => {
       INSERT INTO registration_form (
         nomor_formulir, jurusan_dipilih, nama_lengkap, tempat_lahir, tanggal_lahir,
         jenis_kelamin, agama, sekolah_asal, alamat, telepon, email,
-        nama_ayah, nama_ibu, hasil_lulus , id_gelombang
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        nama_ayah, nama_ibu,  id_gelombang
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
-    const [result] = await db.execute(sql, [nomor_formulir, jurusan_dipilih, nama_lengkap, tempat_lahir, tanggal_lahir, jenis_kelamin, agama, sekolah_asal, alamat, telepon, email, nama_ayah, nama_ibu, "Belum Dikonfirmasi", id_gelombang]);
+    const [result] = await db.execute(sql, [nomor_formulir, jurusan_dipilih, nama_lengkap, tempat_lahir, tanggal_lahir, jenis_kelamin, agama, sekolah_asal, alamat, telepon, email, nama_ayah, nama_ibu, id_gelombang]);
 
     return res.status(201).json({
       status: 201,
