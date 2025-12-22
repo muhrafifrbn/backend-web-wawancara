@@ -187,7 +187,7 @@ export const getActiveRegistration = async (req, res) => {
     return res.status(200).json({
       status: 200,
       msg: "Success Get Active Registration Wave",
-      data: result[0],
+      data: result,
     });
   } catch (error) {
     return res.status(500).json({
