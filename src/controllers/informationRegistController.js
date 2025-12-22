@@ -171,7 +171,6 @@ export const getActiveRegistration = async (req, res) => {
       FROM student_registration
       WHERE tanggal_mulai <= ? 
         AND tanggal_akhir >= ? AND status_gelombang = "Aktif"
-      LIMIT 1
       `,
       [todayStr, todayStr]
     );
