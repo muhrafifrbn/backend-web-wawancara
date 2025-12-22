@@ -155,7 +155,7 @@ export const deleteInformationRegist = async (req, res) => {
   }
 };
 
-export const getActiveRegistrationWave = async (req, res) => {
+export const getActiveRegistration = async (req, res) => {
   try {
     const today = new Date();
     const yyyy = today.getFullYear();
@@ -165,11 +165,12 @@ export const getActiveRegistrationWave = async (req, res) => {
 
     const [result] = await db.query(
       `
-      SELECT id, nama_gelombang, deskripsi, tanggal_mulai, tanggal_akhir,
+      SELECT id, nama_gelombang, deskripsi, DATE_FORMAT(tanggal_mulai, '%Y-%m-%d') AS tanggal_mulai,
+        DATE_FORMAT(tanggal_akhir, '%Y-%m-%d') AS tanggal_akhir,
             tahun_ajaran, status_gelombang
       FROM student_registration
       WHERE tanggal_mulai <= ? 
-        AND tanggal_akhir >= ?
+        AND tanggal_akhir >= ? AND status_gelombang = "Aktif"
       LIMIT 1
       `,
       [todayStr, todayStr]
