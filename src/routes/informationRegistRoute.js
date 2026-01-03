@@ -1,5 +1,5 @@
 import express from "express";
-import { getInformationRegist, getActiveRegistrationWave, getInformationById, submitInformationRegist, updateInformationRegist, deleteInformationRegist } from "../controllers/informationRegistController.js";
+import { getInformationRegist, getActiveRegistration, getInformationById, submitInformationRegist, updateInformationRegist, deleteInformationRegist } from "../controllers/informationRegistController.js";
 
 import { createInformationRegistValidator, updateInformationRegistValidator, idValidator } from "../middlewares/validators/informationRegistValidator.js";
 
@@ -10,9 +10,11 @@ import { verifyToken, verifyAdmin, verifyFormNumber } from "../middlewares/authM
 const router = express.Router();
 
 // mobile
-router.get("/mobile", verifyFormNumber, getActiveRegistrationWave);
+router.get("/mobile", verifyFormNumber, getActiveRegistration);
 
 // Panitia and Admin Can Use
+router.get("/active", verifyToken, getActiveRegistration);
+
 router.get("/", verifyToken, getInformationRegist);
 
 router.get("/:id", verifyToken, idValidator, validate, getInformationById);

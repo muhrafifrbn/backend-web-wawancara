@@ -3,9 +3,15 @@ import db from "../config/db.js";
 export const getInformationRegist = async (req, res) => {
   try {
     const [result] = await db.query(`
-      SELECT id, nama_gelombang, deskripsi, tanggal_mulai, tanggal_akhir,
-      tahun_ajaran, status_gelombang
-      FROM student_registration
+      SELECT 
+        id,
+        nama_gelombang,
+        deskripsi,
+        DATE_FORMAT(tanggal_mulai, '%Y-%m-%d') AS tanggal_mulai,
+        DATE_FORMAT(tanggal_akhir, '%Y-%m-%d') AS tanggal_akhir,
+        tahun_ajaran,
+        status_gelombang
+      FROM student_registration 
       ORDER BY id DESC
     `);
     return res.status(200).json({
@@ -32,7 +38,7 @@ export const submitInformationRegist = async (req, res) => {
       VALUES (?, ?, ?, ?, ?, ?)
     `;
 
-    const [result] = await db.execute(sql, [nama_gelombang, deskripsi, tanggal_mulai, tanggal_akhir, tahun_ajaran, "aktif"]);
+    const [result] = await db.execute(sql, [nama_gelombang, deskripsi, tanggal_mulai, tanggal_akhir, tahun_ajaran, "Aktif"]);
 
     const informationRegistId = result.insertId;
 
@@ -51,8 +57,18 @@ export const getInformationById = async (req, res) => {
 
   try {
     const [rows] = await db.query(
-      `SELECT id, nama_gelombang, deskripsi, tanggal_mulai,  tanggal_akhir,
-      tahun_ajaran,  status_gelombang  FROM student_registration WHERE id = ?`,
+      `
+      SELECT 
+        id,
+        nama_gelombang,
+        deskripsi,
+        DATE_FORMAT(tanggal_mulai, '%Y-%m-%d') AS tanggal_mulai,
+        DATE_FORMAT(tanggal_akhir, '%Y-%m-%d') AS tanggal_akhir,
+        tahun_ajaran,
+        status_gelombang
+      FROM student_registration
+      WHERE id = ?
+  `,
       [id]
     );
 
@@ -139,7 +155,7 @@ export const deleteInformationRegist = async (req, res) => {
   }
 };
 
-export const getActiveRegistrationWave = async (req, res) => {
+export const getActiveRegistration = async (req, res) => {
   try {
     const today = new Date();
     const yyyy = today.getFullYear();
@@ -149,12 +165,12 @@ export const getActiveRegistrationWave = async (req, res) => {
 
     const [result] = await db.query(
       `
-      SELECT id, nama_gelombang, deskripsi, tanggal_mulai, tanggal_akhir,
-             tahun_ajaran, status_gelombang
+      SELECT id, nama_gelombang, deskripsi, DATE_FORMAT(tanggal_mulai, '%Y-%m-%d') AS tanggal_mulai,
+        DATE_FORMAT(tanggal_akhir, '%Y-%m-%d') AS tanggal_akhir,
+            tahun_ajaran, status_gelombang
       FROM student_registration
       WHERE tanggal_mulai <= ? 
-        AND tanggal_akhir >= ?
-      LIMIT 1
+        AND tanggal_akhir >= ? AND status_gelombang = "Aktif"
       `,
       [todayStr, todayStr]
     );
@@ -170,7 +186,7 @@ export const getActiveRegistrationWave = async (req, res) => {
     return res.status(200).json({
       status: 200,
       msg: "Success Get Active Registration Wave",
-      data: result[0],
+      data: result,
     });
   } catch (error) {
     return res.status(500).json({

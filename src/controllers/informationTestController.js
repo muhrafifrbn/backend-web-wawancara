@@ -40,10 +40,7 @@ export const submitInformationTest = async (req, res) => {
 
     const insertedId = result.insertId;
 
-    await db.query(
-      "INSERT INTO user_logs (user_id, action) VALUES (?, ?)",
-      [user_id, `Added Information Test ID-${insertedId} Name ${nama_tes}`]
-    );
+    await db.query("INSERT INTO user_logs (user_id, action) VALUES (?, ?)", [user_id, `Added Information Test ID-${insertedId} Name ${nama_tes}`]);
 
     return res.status(201).json({
       message: "Create Information Test successfully",
@@ -59,8 +56,8 @@ export const getInformationTestById = async (req, res) => {
   const { id } = req.params;
 
   try {
-     const [rows] = await db.query(
-      `SELECT id, nama_tes, deskripsi_tes, created_at 
+    const [rows] = await db.query(
+      `SELECT id, nama_tes, deskripsi_tes 
        FROM information_test 
        WHERE id = ?`,
       [id]
@@ -89,9 +86,9 @@ export const updateInformationTest = async (req, res) => {
   let { nama_tes, deskripsi_tes } = req.body;
 
   try {
-      const user_id = req.user_id;
-      nama_tes = nama_tes?.trim();
-      deskripsi_tes = deskripsi_tes?.trim();
+    const user_id = req.user_id;
+    nama_tes = nama_tes?.trim();
+    deskripsi_tes = deskripsi_tes?.trim();
 
     const sql = `
       UPDATE information_test SET
@@ -109,10 +106,7 @@ export const updateInformationTest = async (req, res) => {
       });
     }
 
-    await db.query(
-      "INSERT INTO user_logs (user_id, action) VALUES (?, ?)",
-      [user_id, `Update Information Test ID-${id} Name ${nama_tes}`]
-    );
+    await db.query("INSERT INTO user_logs (user_id, action) VALUES (?, ?)", [user_id, `Update Information Test ID-${id} Name ${nama_tes}`]);
 
     return res.status(200).json({
       status: 200,
@@ -139,10 +133,7 @@ export const deleteInformationTest = async (req, res) => {
       });
     }
 
-    await db.query(
-      "INSERT INTO user_logs (user_id, action) VALUES (?, ?)",
-      [user_id, `Delete Information Test ID-${id}`]
-    );
+    await db.query("INSERT INTO user_logs (user_id, action) VALUES (?, ?)", [user_id, `Delete Information Test ID-${id}`]);
 
     return res.status(200).json({
       status: 200,
