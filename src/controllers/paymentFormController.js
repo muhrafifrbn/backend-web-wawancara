@@ -4,7 +4,7 @@ import fs from "fs";
 export const getPaymentForm = async (req, res) => {
   try {
     const [result] = await db.query(`
-      SELECT id, nama_tagihan, nama_bank, bukti_bayar, tanggal_transfer,
+      SELECT id, nama_tagihan, nama_bank, bukti_bayar, DATE_FORMAT(tanggal_transfer, "%Y-%m-%d") AS tanggal_transfer,
              jumlah_tagihan, konfirmasi_pembayaran, id_formulir
       FROM payment_form
       ORDER BY id DESC
