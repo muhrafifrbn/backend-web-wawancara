@@ -6,7 +6,7 @@ export const getTestSchedule = async (req, res) => {
     const [result] = await db.query(`
       SELECT 
         ts.id, 
-        ts.tanggal_tes, 
+        DATE_FORMAT(ts.tanggal_tes, "%Y-%m-%d") AS tanggal_test, 
         ts.jam_mulai, 
         ts.jam_selesai, 
         ts.informasi_ruangan, 

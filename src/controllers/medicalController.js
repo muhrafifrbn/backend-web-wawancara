@@ -1,7 +1,7 @@
 import db from "../config/db.js";
 
 export const submitMedicalCheckForm = async (req, res) => {
-  
+  console.log(req.body);
   const {
     student_name,
     weight,
@@ -12,6 +12,8 @@ export const submitMedicalCheckForm = async (req, res) => {
     date_of_birth,
     gender,
     address,
+    allergies,
+    medical_conditions,
     medical_notes,
     parent_knowledge_smoking_history,
     parent_knowledge_tattoo_piercing,
@@ -23,10 +25,10 @@ export const submitMedicalCheckForm = async (req, res) => {
   const query = `
     INSERT INTO medical_check_form (
       student_name, weight, height, blood_type, participant_card_number, place_of_birth,
-      date_of_birth, gender, address, medical_notes, 
+      date_of_birth, gender, address, medical_notes, allergies, medical_conditions,
       parent_knowledge_smoking_history, parent_knowledge_tattoo_piercing, 
       interview_date, interviewer_name, interviewer_notes
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)
   `;
 
   try {
@@ -42,6 +44,8 @@ export const submitMedicalCheckForm = async (req, res) => {
       gender,
       address,
       medical_notes,
+      allergies,
+      medical_conditions,
       parent_knowledge_smoking_history,
       parent_knowledge_tattoo_piercing,
       interview_date,
@@ -50,31 +54,27 @@ export const submitMedicalCheckForm = async (req, res) => {
     ]);
 
     const medicaFormId = result.insertId;
-  
 
-    await db.query(
-      'INSERT INTO user_logs (user_id, action) VALUES (?,?)',
-      [user_id,`Added Medical Data ID-${medicaFormId} Name ${student_name}`]
-    )
+    await db.query("INSERT INTO user_logs (user_id, action) VALUES (?,?)", [user_id, `Added Medical Data ID-${medicaFormId} Name ${student_name}`]);
 
     res.status(201).json({
       message: "Medical check form submitted successfully",
       formId: result.insertId,
     });
   } catch (err) {
-    console.log(err)
+    console.log(err);
     res.status(500).json({ error: "Failed to submit medical check form" });
   }
 };
 
 export const getMedicalFormsById = async (req, res) => {
-  const {id} = req.params;
+  const { id } = req.params;
   const query = `SELECT * FROM medical_check_form WHERE id= ?`;
 
   try {
     const [result] = await db.query(query, [id]);
-    if(result.length === 0 ) {
-      return res.status(404).json({error: "Medical form not found"});
+    if (result.length === 0) {
+      return res.status(404).json({ error: "Medical form not found" });
     }
     res.status(200).json(result[0]);
   } catch (error) {
@@ -91,7 +91,6 @@ export const getMedicalCheckForms = async (req, res) => {
   } catch (err) {
     console.error("Error fetching medical check forms:", err);
     res.status(500).json({ error: "Failed to retrieve medical check forms" });
-  
   }
 };
 
@@ -149,10 +148,7 @@ export const updateMedicalCheckForm = async (req, res) => {
       return res.status(404).json({ error: "Medical form not found" });
     }
 
-    await db.query(
-      'INSERT INTO user_logs (user_id, action) VALUES (?,?)',
-      [user_id, `Updated Medical Data ID-${id} Name ${student_name}`]
-    );
+    await db.query("INSERT INTO user_logs (user_id, action) VALUES (?,?)", [user_id, `Updated Medical Data ID-${id} Name ${student_name}`]);
 
     res.status(200).json({ message: "Medical check form updated successfully" });
   } catch (err) {
@@ -173,10 +169,7 @@ export const deleteMedicalCheckForm = async (req, res) => {
       return res.status(404).json({ error: "Medical form not found" });
     }
 
-    await db.query(
-      'INSERT INTO user_logs (user_id, action) VALUES (?,?)',
-      [user_id, `Deleted Medical Data ID-${id}`]
-    );
+    await db.query("INSERT INTO user_logs (user_id, action) VALUES (?,?)", [user_id, `Deleted Medical Data ID-${id}`]);
 
     res.status(200).json({ message: "Medical check form deleted successfully" });
   } catch (err) {
