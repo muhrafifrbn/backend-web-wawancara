@@ -3,7 +3,7 @@ import db from "../config/db.js";
 export const getRegistrationForm = async (req, res) => {
   try {
     const [result] = await db.query(`
-      SELECT id, nomor_formulir, nama_lengkap, jurusan_dipilih, tanggal_lahir, jenis_kelamin, email
+      SELECT id, nomor_formulir, nama_lengkap, jurusan_dipilih, DATE_FORMAT(tanggal_lahir, "%Y-%m-%d") AS tanggal_lahir, jenis_kelamin, email
       FROM registration_form
       ORDER BY id DESC
     `);
@@ -38,7 +38,7 @@ export const submitRegistrationForm = async (req, res) => {
         WHERE tanggal_mulai <= ? AND tanggal_akhir >= ? AND status_gelombang = 'Aktif'
         LIMIT 1
       `,
-      [todayStr, todayStr]
+      [todayStr, todayStr],
     );
 
     if (gelombang.length === 0) {

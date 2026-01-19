@@ -72,7 +72,27 @@ export const submitPaymentForm = async (req, res) => {
       ) VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
 
+    // tambah data pembayaran
     const [result] = await db.execute(sql, [nama_tagihan, nama_bank, bukti_bayar, tanggal_transfer, jumlah_tagihan, 0, id_formulir]);
+
+    // ambil data formulir
+    const sqlGetFormulir = `SELECT jurusan_dipilih FROM registration_form WHERE id = ?`;
+    const [resultFormulir] = await db.execute(sqlGetFormulir, [id_formulir]);
+    console.log(resultFormulir);
+
+    // ambil data student_count
+    const sqlGetJurusan = `SELECT id, current_registered FROM student_counts WHERE UPPER(competence_name)  = UPPER(?)`;
+    const [resultGetJurusan] = await db.execute(sqlGetJurusan, [resultFormulir[0].jurusan_dipilih]);
+    console.log(resultGetJurusan);
+
+    // ubah data jumlah registrasi saat ini
+    const sqlUpdateJurusan = `UPDATE student_counts
+                              SET current_registered  = ${resultGetJurusan[0].current_registered + 1}
+                              WHERE id = ${resultGetJurusan[0].id}
+                              `;
+
+    const [resultUpdateJurusan] = await db.execute(sqlUpdateJurusan);
+    console.log(resultUpdateJurusan);
 
     return res.status(201).json({
       status: 201,
@@ -213,7 +233,7 @@ export const updateConfirmPayment = async (req, res) => {
       WHERE id = ?
       LIMIT 1
       `,
-      [konfirmasi_pembayaran, id]
+      [konfirmasi_pembayaran, id],
     );
 
     if (result.affectedRows === 0) {
